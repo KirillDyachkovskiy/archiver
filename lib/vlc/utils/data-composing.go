@@ -1,20 +1,20 @@
-package vlc
+package utils
 
 import (
+	"archiver/lib/vlc/models"
 	"encoding/binary"
 	"errors"
 )
 
-type encodingTable []byte
-
 const (
-	encodingTableSizeMetaSize = 4
-	sourceDataSizeMetaSize    = 4
+	encodingTreeSizeMetaSize = 4
+	sourceDataSizeMetaSize   = 4
 )
 
-func composeData(encodingTableBuff encodingTable, sourceDataBuff []byte) []byte {
+func ComposeData(tree models.EncodingTree, sourceDataBuff []byte) []byte {
+	encodingTableBuff := tree.Bytes()
 	encodingTableSize := uint32(len(encodingTableBuff))
-	encodingTableSizeBuff := make([]byte, encodingTableSizeMetaSize)
+	encodingTableSizeBuff := make([]byte, encodingTreeSizeMetaSize)
 	binary.BigEndian.PutUint32(encodingTableSizeBuff, encodingTableSize)
 
 	sourceDataSize := uint32(len(sourceDataBuff))
@@ -30,31 +30,23 @@ func composeData(encodingTableBuff encodingTable, sourceDataBuff []byte) []byte 
 	return composedData
 }
 
-func parseData(composedData []byte) (table encodingTable, sourceData []byte, err error) {
+func ParseData(composedData []byte) (tree models.EncodingTree, sourceData []byte, err error) {
 	defer func() {
 		if recover() != nil {
 			err = errors.New("input is not a encoded file")
 		}
 	}()
 
-	encodingTableSize := binary.BigEndian.Uint32(composedData[:encodingTableSizeMetaSize])
-	composedData = composedData[encodingTableSizeMetaSize:]
+	encodingTreeSize := binary.BigEndian.Uint32(composedData[:encodingTreeSizeMetaSize])
+	composedData = composedData[encodingTreeSizeMetaSize:]
 
 	sourceDataSize := binary.BigEndian.Uint32(composedData[:sourceDataSizeMetaSize])
 	composedData = composedData[sourceDataSizeMetaSize:]
 
-	table = composedData[:encodingTableSize]
-	composedData = composedData[encodingTableSize:]
+	tree = models.ParseEncodingTree(composedData[:encodingTreeSize])
+	composedData = composedData[encodingTreeSize:]
 
 	sourceData = composedData[:sourceDataSize]
 
-	return table, sourceData, err
-}
-
-func encodeData(table encodingTable, sourceData []byte) []byte {
-	return sourceData
-}
-
-func decodeData(table encodingTable, encodedData []byte) []byte {
-	return encodedData
+	return tree, sourceData, err
 }

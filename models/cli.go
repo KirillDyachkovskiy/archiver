@@ -1,4 +1,4 @@
-package main
+package models
 
 type Operation uint8
 type Method uint8
@@ -44,23 +44,10 @@ var (
 	}
 )
 
-func (o Operation) isValid() bool {
+func (o Operation) IsValid() bool {
 	return o >= 1 && o <= 2
 }
 
-func (m Method) isValid() bool {
+func (m Method) IsValid() bool {
 	return m >= 1 && m <= 2
-}
-
-type Encoder interface {
-	Encode(data []byte) []byte
-}
-
-type Decoder interface {
-	Decode(data []byte) []byte
-}
-
-type EncoderDecoder interface {
-	Encoder
-	Decoder
 }

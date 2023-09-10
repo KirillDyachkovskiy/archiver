@@ -1,26 +1,33 @@
 package vlc
 
+import (
+	"archiver/lib/vlc/models"
+	vlcUtils "archiver/lib/vlc/utils"
+	"archiver/utils"
+	"fmt"
+)
+
 type ShannonFano struct{}
 
-func (sf ShannonFano) getEncodingTable(sourceData []byte) encodingTable {
-	var mockEncodingTable = []byte{1, 2}
+func (sf ShannonFano) getEncodingTree(sourceData []byte) models.EncodingTree {
+	counter := utils.CountBytes(sourceData)
+	fmt.Println(counter)
 
-	return mockEncodingTable
+	return models.EncodingTree{}
 }
 
 func (sf ShannonFano) Encode(sourceData []byte) []byte {
-	table := sf.getEncodingTable(sourceData)
-	encodedData := encodeData(table, sourceData)
+	tree := sf.getEncodingTree(sourceData)
 
-	return composeData(table, encodedData)
+	return vlcUtils.ComposeData(tree, sourceData)
 }
 
 func (sf ShannonFano) Decode(composedData []byte) []byte {
-	table, encodedData, err := parseData(composedData)
+	_, encodedData, err := vlcUtils.ParseData(composedData)
 
 	if err != nil {
 		panic(err)
 	}
 
-	return decodeData(table, encodedData)
+	return encodedData
 }

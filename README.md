@@ -15,6 +15,7 @@ go build -o ./build
 2) Create file with some data
 
 ```bash
+rm -rf ./tests
 mkdir ./tests
 touch ./tests/test_1.txt
 echo "Hello, world\!" >> ./tests/test_1.txt

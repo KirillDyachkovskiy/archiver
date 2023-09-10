@@ -1,21 +1,23 @@
 package main
 
 import (
+	"archiver/lib"
 	"archiver/lib/vlc"
+	"archiver/models"
 	"archiver/utils"
 	"fmt"
 )
 
 func main() {
-	options := GetOptions()
+	options := lib.GetOptions()
 
-	var method EncoderDecoder
+	var method models.EncoderDecoder
 
 	switch options.Method {
-	case MethodHuffman:
+	case models.MethodHuffman:
 		fmt.Println("Huffman")
 		method = vlc.Huffman{}
-	case MethodShannonFano:
+	case models.MethodShannonFano:
 		fmt.Println("ShannonFano")
 		method = vlc.ShannonFano{}
 	}
@@ -24,10 +26,10 @@ func main() {
 	var resultBuff []byte
 
 	switch options.Operation {
-	case OperationEncode:
+	case models.OperationEncode:
 		fmt.Println("Encode")
 		resultBuff = method.Encode(buff)
-	case OperationDecode:
+	case models.OperationDecode:
 		fmt.Println("Decode")
 		resultBuff = method.Decode(buff)
 	}
