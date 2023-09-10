@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestBinaryTree_Deserialize(t *testing.T) {
+func TestBinaryTree_Serialize(t *testing.T) {
 	type testCase[T comparable] struct {
 		name string
 		bt   BinaryTree[T]
@@ -102,7 +102,7 @@ func TestBinaryTree_Deserialize(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.bt.Deserialize(); !reflect.DeepEqual(got, tt.want) {
+			if got := tt.bt.Serialize(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Deserialize() = %v, want %v", got, tt.want)
 			}
 		})

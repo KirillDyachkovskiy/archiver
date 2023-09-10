@@ -6,7 +6,7 @@ type BinaryTree[T comparable] struct {
 	Right *BinaryTree[T]
 }
 
-func (bt *BinaryTree[T]) Deserialize() []T {
+func (bt *BinaryTree[T]) Serialize() []T {
 	var result []T
 
 	stack := []*BinaryTree[T]{bt}
