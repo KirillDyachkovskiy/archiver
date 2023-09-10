@@ -1,19 +1,19 @@
 package vlc
 
 import (
-	"archiver/lib/vlc/models"
 	vlcUtils "archiver/lib/vlc/utils"
 	"archiver/utils"
+	"archiver/utils/binaryTree"
 	"fmt"
 )
 
 type Huffman struct{}
 
-func (h Huffman) getEncodingTree(sourceData []byte) models.EncodingTree {
+func (h Huffman) getEncodingTree(sourceData []byte) binaryTree.BinaryTree[byte] {
 	counter := utils.CountBytes(sourceData)
 	fmt.Println(counter)
 
-	return models.EncodingTree{}
+	return binaryTree.BinaryTree[byte]{}
 }
 
 func (h Huffman) Encode(sourceData []byte) []byte {
