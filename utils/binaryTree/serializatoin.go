@@ -6,81 +6,72 @@ type BinaryTree[T comparable] struct {
 	Right *BinaryTree[T]
 }
 
-func (bt *BinaryTree[T]) Serialize() []T {
-	var result []T
+type stackNode[T comparable] struct {
+	bt    *BinaryTree[T]
+	index int
+}
 
-	stack := []*BinaryTree[T]{bt}
+func (bt *BinaryTree[T]) Serialize(capacity int) []T {
+	result := make([]T, capacity)
+	maxLen := 0
+
+	stack := []stackNode[T]{
+		{
+			bt:    bt,
+			index: 0,
+		},
+	}
 
 	for len(stack) > 0 {
-		node := stack[len(stack)-1]
+		sn := stack[len(stack)-1]
 		stack = stack[:len(stack)-1]
 
-		if node == nil {
-			result = append(result, getZero[T]())
+		if sn.bt == nil {
 			continue
 		}
 
-		result = append(result, node.Value)
+		maxLen = max(maxLen, sn.index)
+		result[sn.index] = sn.bt.Value
 
-		stack = append(stack, node.Right)
-		stack = append(stack, node.Left)
+		stack = append(stack, stackNode[T]{
+			bt:    sn.bt.Left,
+			index: sn.index*2 + 1,
+		})
+		stack = append(stack, stackNode[T]{
+			bt:    sn.bt.Right,
+			index: sn.index*2 + 2,
+		})
 	}
 
-	return result
+	return result[:min(maxLen+1, capacity)]
 }
 
 func Deserialize[T comparable](data []T) BinaryTree[T] {
-	genZero := getZero[T]()
+	treesPtr := make([]*BinaryTree[T], len(data))
 
-	var stack []*BinaryTree[T]
+	for index, value := range data {
+		node := &BinaryTree[T]{
+			Value: value,
+		}
+		treesPtr[index] = node
 
-	isLastNil := false
-
-	for _, item := range data {
-		if item != genZero {
-			newNode := &BinaryTree[T]{Value: item}
-
-			if len(stack) == 0 {
-				stack = append(stack, newNode)
-				continue
-			}
-
-			lastNode := stack[len(stack)-1]
-
-			if isLastNil {
-				lastNode.Right = newNode
-				isLastNil = false
-			} else {
-				lastNode.Left = newNode
-			}
-
-			stack = append(stack, newNode)
+		if index == 0 {
 			continue
 		}
 
-		if len(stack) == 0 {
-			continue
-		}
+		parentIndex := (index - 1) / 2
 
-		if isLastNil {
-			if len(stack) == 1 {
-				return *stack[0]
-			}
-
-			stack = stack[:len(stack)-1]
-
-			for len(stack) > 1 && stack[len(stack)-1].Right != nil {
-				stack = stack[:len(stack)-1]
-			}
+		if index%2 == 0 {
+			treesPtr[parentIndex].Right = node
 		} else {
-			isLastNil = true
+			treesPtr[parentIndex].Left = node
 		}
 	}
 
-	return *stack[0]
+	return *treesPtr[0]
 }
 
-func getZero[T any]() T {
+func GetZero[T any]() T {
 	var result T
 	return result
 }

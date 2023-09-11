@@ -1,52 +1,53 @@
 package utils
 
 import (
-	"archiver/lib/vlc/models"
+	"bytes"
 	"encoding/binary"
 	"errors"
 )
 
 const (
-	encodingTreeSizeMetaSize = 4
-	sourceDataSizeMetaSize   = 4
+	treeBuffSizeMetaSize   = 4
+	sourceDataSizeMetaSize = 4
 )
 
-func ComposeData(tree models.EncodingTree, sourceDataBuff []byte) []byte {
-	encodingTableBuff := tree.Bytes()
-	encodingTableSize := uint32(len(encodingTableBuff))
-	encodingTableSizeBuff := make([]byte, encodingTreeSizeMetaSize)
-	binary.BigEndian.PutUint32(encodingTableSizeBuff, encodingTableSize)
+func ComposeData(treeBuff []byte, sourceDataBuff []byte) []byte {
+	treeSize := uint32(len(treeBuff))
+
+	treeSizeBuff := make([]byte, treeBuffSizeMetaSize)
+	binary.BigEndian.PutUint32(treeSizeBuff, treeSize)
 
 	sourceDataSize := uint32(len(sourceDataBuff))
 	sourceDataSizeBuff := make([]byte, sourceDataSizeMetaSize)
 	binary.BigEndian.PutUint32(sourceDataSizeBuff, sourceDataSize)
 
-	var composedData []byte
-	composedData = append(composedData, encodingTableSizeBuff...)
-	composedData = append(composedData, sourceDataSizeBuff...)
-	composedData = append(composedData, encodingTableBuff...)
-	composedData = append(composedData, sourceDataBuff...)
+	var composedDataBuff bytes.Buffer
 
-	return composedData
+	composedDataBuff.Write(treeSizeBuff)
+	composedDataBuff.Write(sourceDataSizeBuff)
+	composedDataBuff.Write(treeBuff)
+	composedDataBuff.Write(sourceDataBuff)
+
+	return composedDataBuff.Bytes()
 }
 
-func ParseData(composedData []byte) (tree models.EncodingTree, sourceData []byte, err error) {
+func ParseData(composedData []byte) (treeBuff []byte, sourceData []byte, err error) {
 	defer func() {
 		if recover() != nil {
 			err = errors.New("input is not a encoded file")
 		}
 	}()
 
-	encodingTreeSize := binary.BigEndian.Uint32(composedData[:encodingTreeSizeMetaSize])
-	composedData = composedData[encodingTreeSizeMetaSize:]
+	encodingTreeSize := binary.BigEndian.Uint32(composedData[:treeBuffSizeMetaSize])
+	composedData = composedData[treeBuffSizeMetaSize:]
 
 	sourceDataSize := binary.BigEndian.Uint32(composedData[:sourceDataSizeMetaSize])
 	composedData = composedData[sourceDataSizeMetaSize:]
 
-	tree = models.ParseEncodingTree(composedData[:encodingTreeSize])
+	treeBuff = composedData[:encodingTreeSize]
 	composedData = composedData[encodingTreeSize:]
 
 	sourceData = composedData[:sourceDataSize]
 
-	return tree, sourceData, err
+	return treeBuff, sourceData, err
 }

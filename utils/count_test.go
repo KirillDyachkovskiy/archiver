@@ -55,7 +55,7 @@ func TestCountBytes(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := CountBytes(tt.args.sourceData); !reflect.DeepEqual(got, tt.want) {
+			if got := Count(tt.args.sourceData); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("CountBytes() = %v, want %v", got, tt.want)
 			}
 		})

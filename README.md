@@ -18,7 +18,7 @@ go build -o ./build
 rm -rf ./tests
 mkdir ./tests
 touch ./tests/test_1.txt
-echo "Hello, world\!" >> ./tests/test_1.txt
+cp ./docs/test.txt ./tests/test_1.txt
 ```
 
 3) Encode the file
