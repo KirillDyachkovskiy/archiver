@@ -15,7 +15,7 @@ func (bt *BinaryTree[T]) Serialize(capacity int) []T {
 	result := make([]T, capacity)
 	maxLen := 0
 
-	stack := []stackNode[T]{
+	stack := []*stackNode[T]{
 		{
 			bt:    bt,
 			index: 0,
@@ -30,23 +30,24 @@ func (bt *BinaryTree[T]) Serialize(capacity int) []T {
 			continue
 		}
 
-		maxLen = max(maxLen, sn.index)
+		maxLen = max(maxLen, sn.index+1)
 		result[sn.index] = sn.bt.Value
 
-		stack = append(stack, stackNode[T]{
+		stack = append(stack, &stackNode[T]{
 			bt:    sn.bt.Left,
 			index: sn.index*2 + 1,
 		})
-		stack = append(stack, stackNode[T]{
+		stack = append(stack, &stackNode[T]{
 			bt:    sn.bt.Right,
 			index: sn.index*2 + 2,
 		})
 	}
 
-	return result[:min(maxLen+1, capacity)]
+	return result[:min(maxLen, capacity)]
 }
 
 func Deserialize[T comparable](data []T) BinaryTree[T] {
+	// TODO correctly calc treesPtr len
 	treesPtr := make([]*BinaryTree[T], len(data))
 
 	for index, value := range data {
@@ -69,9 +70,4 @@ func Deserialize[T comparable](data []T) BinaryTree[T] {
 	}
 
 	return *treesPtr[0]
-}
-
-func GetZero[T any]() T {
-	var result T
-	return result
 }

@@ -9,7 +9,7 @@
 1) Build a binary file
 
 ```bash
-go build -o ./build
+go build -o ./build archiver/cmd 
 ```
 
 2) Create file with some data
@@ -18,7 +18,7 @@ go build -o ./build
 rm -rf ./tests
 mkdir ./tests
 touch ./tests/test_1.txt
-cp ./docs/test.txt ./tests/test_1.txt
+cp ./docs/test_3.txt ./tests/test_1.txt
 ```
 
 3) Encode the file

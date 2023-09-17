@@ -265,7 +265,7 @@ func TestDeserialize(t *testing.T) {
 		{
 			name: "case with one long hand",
 			args: args[byte]{
-				data: []byte{1, 2, 3, 4, 5, 0, 0, 0, 0, 0, 0},
+				data: []byte{1, 2, 0, 3, 0, 0, 0, 4},
 			},
 			want: BinaryTree[byte]{
 				Value: 1,
@@ -275,11 +275,13 @@ func TestDeserialize(t *testing.T) {
 						Value: 3,
 						Left: &BinaryTree[byte]{
 							Value: 4,
-							Left: &BinaryTree[byte]{
-								Value: 5,
-							},
 						},
 					},
+					Right: &BinaryTree[byte]{},
+				},
+				Right: &BinaryTree[byte]{
+					Left:  &BinaryTree[byte]{},
+					Right: &BinaryTree[byte]{},
 				},
 			},
 		},

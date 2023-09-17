@@ -17,8 +17,19 @@ func BinaryStringToBytes(str string) []byte {
 		return result
 	}
 
-	for left := 0; left < len(str); left += 8 {
-		right := min(left+8, len(str))
+	wholeBytesCount := len(str) / bitsInByte
+	bitsInFirstByte := len(str) - wholeBytesCount*bitsInByte
+
+	if bitsInFirstByte != 0 {
+		parsedFirstByte, err := strconv.ParseUint(str[:bitsInFirstByte], 2, bitsInFirstByte)
+		if err != nil {
+			panic("string is not binary")
+		}
+		result = append(result, byte(parsedFirstByte))
+	}
+
+	for left := bitsInFirstByte; left < len(str); left += bitsInByte {
+		right := min(left+bitsInByte, len(str))
 
 		currByte, err := strconv.ParseUint(str[left:right], 2, bitsInByte)
 		if err != nil {
