@@ -1,5 +1,7 @@
 package vlc
 
+import "sort"
+
 type Code struct {
 	Value byte
 	Count int
@@ -19,6 +21,10 @@ func GetCodes(sourceData []byte) []Code {
 		}
 		result[codeIndex[char]].Count++
 	}
+
+	sort.Slice(result, func(i int, j int) bool {
+		return result[i].Count > result[j].Count
+	})
 
 	return result
 }

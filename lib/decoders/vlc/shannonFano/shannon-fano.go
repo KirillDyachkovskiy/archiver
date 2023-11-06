@@ -20,28 +20,21 @@ const (
 )
 
 func getDelimiterPosition(codes []vlc.Code) int {
-	//totalCount := 0
-	//for _, code := range codes {
-	//	totalCount += code.Count
-	//}
-	//
-	//bestPosition := 0
-	//
-	//for index, code := range codes {
-	//	if index == 0 {
-	//		continue
-	//	}
-	//
-	//	if codes[index-1].Count
-	//
-	//	codes[index-1].Count <
-	//}
-
-	if len(codes)%2 == 0 {
-		return len(codes) / 2
+	totalCount := 0
+	for _, code := range codes {
+		totalCount += code.Count
 	}
 
-	return (len(codes) + 1) / 2
+	leftHandCount := 0
+	for index, code := range codes {
+		leftHandCount += code.Count
+
+		if leftHandCount >= totalCount/2 {
+			return index + 1
+		}
+	}
+
+	return len(codes)
 }
 
 func New() *shannonFano {
@@ -56,6 +49,8 @@ func (sf *shannonFano) getEncodingTree(sourceData *[]byte) (tree binaryTree.Bina
 
 	codes := vlc.GetCodes(*sourceData)
 
+	// TODO implement binary try like array
+	// TODO pass to backtrack indexes, not array copy
 	backtrack = func(codes []vlc.Code, node *binaryTree.BinaryTree[byte], prefix *[]uint8) {
 		if len(codes) == 0 {
 			return
@@ -108,9 +103,9 @@ func (sf *shannonFano) Encode(sourceData []byte) []byte {
 		buff.WriteString(table[char])
 	}
 
-	treeBuff := tree.Serialize(2*math.MaxUint8 + 1)
+	treeBuff := tree.Serialize(math.MaxUint16 + 1)
 
-	// add trailing "1" to all encoded dataÏ
+	// add trailing "1" to all encoded data
 	encodedData := utils.BinaryStringToBytes(trailingOneStr + buff.String())
 
 	return vlc.ComposeData(treeBuff, encodedData)
